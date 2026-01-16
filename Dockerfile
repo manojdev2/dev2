@@ -1,6 +1,6 @@
 FROM php:8.2-cli
 
-# System dependencies
+# System deps
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
@@ -9,20 +9,24 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libfreetype6-dev
 
-# PHP extensions (IMPORTANT: exif)
+# PHP extensions
 RUN docker-php-ext-install \
-    mysqli \
     pdo \
     pdo_mysql \
+    mysqli \
     exif
 
-# Install Composer
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 COPY . .
 
-# Install PHP dependencies
+# 🔑 CREATE SQLITE FILE (THIS FIXES YOUR ERROR)
+RUN mkdir -p database \
+    && touch database/database.sqlite
+
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 10000
