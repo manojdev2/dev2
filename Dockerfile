@@ -19,10 +19,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-# Required for Laravel
+# ✅ SAFE: no failure if folders don't exist
 RUN mkdir -p database \
     && touch database/database.sqlite \
-    && chmod -R 777 storage bootstrap/cache
+    && if [ -d storage ]; then chmod -R 777 storage; fi \
+    && if [ -d bootstrap/cache ]; then chmod -R 777 bootstrap/cache; fi
 
 RUN composer install --no-dev --optimize-autoloader
 
